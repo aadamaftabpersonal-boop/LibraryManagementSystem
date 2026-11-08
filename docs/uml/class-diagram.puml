@@ -1,0 +1,225 @@
+@startuml class-diagram
+title Library Management System - Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty members
+
+class Main {
+  +{static} main(args : String[]) : void
+  ~{static} buildRegistry(library : Library) : CommandRegistry
+}
+
+package "domain.item" {
+  abstract class LibraryItem {
+    -id : String
+    -title : String
+    #LibraryItem(id : String, title : String)
+    +getId() : String
+    +getTitle() : String
+    +{abstract} getType() : ItemType
+  }
+
+  interface Borrowable {
+    +getId() : String
+    +getTitle() : String
+    +getFinePerDay() : int
+  }
+
+  class Book {
+    -author : String
+    +getFinePerDay() : int
+  }
+
+  class Magazine {
+    -issue : String
+    +getFinePerDay() : int
+  }
+
+  class ReferenceBook {
+    -author : String
+  }
+
+  enum ItemType {
+    BOOK
+    MAGAZINE
+    REFERENCE
+  }
+
+  enum ItemStatus {
+    AVAILABLE
+    ON_LOAN
+    NOT_BORROWABLE
+  }
+}
+
+package "domain.member" {
+  abstract class Member {
+    -id : String
+    -name : String
+    +getId() : String
+    +getName() : String
+    +{abstract} getMaxItems() : int
+    +{abstract} getLoanPeriodDays() : int
+    +ensureCanBorrow(currentLoans : int) : void
+  }
+
+  class Student
+  class Staff
+  class Faculty
+
+  class MemberFactory {
+    +{static} create(type : String, id : String, name : String) : Member
+  }
+}
+
+package "domain.loan" {
+  class Loan {
+    -item : Borrowable
+    -member : Member
+    -borrowDay : int
+    -dueDay : int
+    +Loan(item : Borrowable, member : Member, borrowDay : int)
+    +getItem() : Borrowable
+    +getMember() : Member
+    +getDueDay() : int
+    +daysLate(today : int) : int
+    +fineAsOf(today : int) : int
+    +isOverdue(today : int) : boolean
+  }
+}
+
+package "domain.exception" {
+  abstract class LibraryException
+  class ItemNotFoundException
+  class MemberNotFoundException
+  class ItemNotAvailableException {
+    +{static} onLoan(itemId : String) : ItemNotAvailableException
+    +{static} notBorrowable(itemId : String) : ItemNotAvailableException
+  }
+  class BorrowLimitExceededException
+  class ItemNotOnLoanException
+}
+
+package "service" {
+  class Library <<Facade>> {
+    -catalog : Catalog
+    -members : MemberRegistry
+    -loans : LoanRegistry
+    -clock : SimulatedClock
+    +addItem(item : LibraryItem) : void
+    +addMember(member : Member) : void
+    +borrow(memberId : String, itemId : String) : Loan
+    +returnItem(itemId : String) : int
+    +advance(days : int) : int
+    +search(text : String) : List<LibraryItem>
+    +loansOf(memberId : String) : List<Loan>
+    +overdueLoans() : List<Loan>
+    +inventory() : List<LibraryItem>
+    +statusOf(item : LibraryItem) : ItemStatus
+    +findLoan(itemId : String) : Optional<Loan>
+    +today() : int
+  }
+
+  class Catalog {
+    -items : Map<String, LibraryItem>
+    +add(item : LibraryItem) : void
+    +get(id : String) : LibraryItem
+    +all() : Collection<LibraryItem>
+  }
+
+  class MemberRegistry {
+    -members : Map<String, Member>
+    +add(member : Member) : void
+    +get(id : String) : Member
+  }
+
+  class LoanRegistry {
+    -activeLoans : Map<String, Loan>
+    +open(loan : Loan) : void
+    +close(itemId : String) : Loan
+    +isOnLoan(itemId : String) : boolean
+    +find(itemId : String) : Optional<Loan>
+    +countFor(memberId : String) : int
+    +loansOf(memberId : String) : List<Loan>
+    +all() : Collection<Loan>
+  }
+
+  class SimulatedClock {
+    -today : int
+    +today() : int
+    +advance(days : int) : int
+  }
+}
+
+package "cli" {
+  class CommandLoop {
+    -registry : CommandRegistry
+    +run(in : BufferedReader, out : PrintStream) : void
+  }
+
+  class CommandRegistry {
+    -commands : Map<String, Command>
+    +register(name : String, command : Command) : void
+    +find(name : String) : Optional<Command>
+  }
+
+  interface Command {
+    +execute(args : String[]) : List<String>
+  }
+
+  class BorrowCommand
+  class ReturnCommand
+  class InventoryCommand
+
+  class ReportFormatter {
+    +{static} rowsOrNone(rows : List<String>) : List<String>
+  }
+
+  note "One class per command (11 total):\nADD_BOOK, ADD_MAGAZINE, ADD_REFERENCE, ADD_MEMBER,\nBORROW, RETURN, ADVANCE, SEARCH, LOANS, OVERDUE, INVENTORY" as N1
+}
+
+' ---- Relationships ----
+LibraryItem <|-- Book
+LibraryItem <|-- Magazine
+LibraryItem <|-- ReferenceBook
+Borrowable <|.. Book
+Borrowable <|.. Magazine
+LibraryItem ..> ItemType
+
+Member <|-- Student
+Member <|-- Staff
+Member <|-- Faculty
+MemberFactory ..> Member : <<creates>>
+
+Loan "0..*" --> "1" Borrowable : item >
+Loan "0..*" --> "1" Member
+
+RuntimeException <|-- LibraryException
+LibraryException <|-- ItemNotFoundException
+LibraryException <|-- MemberNotFoundException
+LibraryException <|-- ItemNotAvailableException
+LibraryException <|-- BorrowLimitExceededException
+LibraryException <|-- ItemNotOnLoanException
+
+Library *-- "1" Catalog
+Library *-- "1" MemberRegistry
+Library *-- "1" LoanRegistry
+Library *-- "1" SimulatedClock
+Library ..> ItemStatus
+Catalog o-- "0..*" LibraryItem
+MemberRegistry o-- "0..*" Member
+LoanRegistry o-- "0..*" Loan
+
+Main ..> Library : <<creates>>
+Main ..> CommandLoop
+CommandLoop --> "1" CommandRegistry
+CommandRegistry o-- "0..*" Command
+Command <|.. BorrowCommand
+Command <|.. ReturnCommand
+Command <|.. InventoryCommand
+BorrowCommand --> Library
+ReturnCommand --> Library
+InventoryCommand --> Library
+InventoryCommand ..> ReportFormatter
+@enduml
