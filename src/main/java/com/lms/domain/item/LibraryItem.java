@@ -5,8 +5,8 @@ public abstract class LibraryItem{
     private final String id;
     private final String title;
     protected LibraryItem(String id, String title){
-        this.id = id;
-        this.title = title;
+        this.id = Objects.requireNonNull(id, "id");
+        this.title = Objects.requireNonNull(title, "title");
     }
     public String getId(){
         return this.id;
@@ -27,6 +27,6 @@ public abstract class LibraryItem{
     }
     @Override
     public String toString(){
-        return getType() + " " + id + "\"" + title + "\"";
+        return getType() + " " + id + " \"" + title + "\"";
     }
 }
