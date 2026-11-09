@@ -1,34 +1,33 @@
 package com.lms;
-import com.lms.domain.item.Book;
-import com.lms.domain.item.Borrowable;
-import com.lms.domain.item.LibraryItem;
-import com.lms.domain.item.Magazine;
-import com.lms.domain.item.ReferenceBook;
-import com.lms.domain.member.Faculty;
-import com.lms.domain.member.Member;
-import com.lms.domain.member.Staff;
-import com.lms.domain.member.Student;
 
-import java.util.List;
+import com.lms.cli.CommandLoop;
+import com.lms.cli.CommandRegistry;
+import com.lms.cli.command.AddBookCommand;
+import com.lms.cli.command.AddMagazineCommand;
+import com.lms.cli.command.AddMemberCommand;
+import com.lms.cli.command.AddReferenceCommand;
+import com.lms.cli.command.InventoryCommand;
+import com.lms.service.Library;
 
-public class Main{
-    public static void main(String[] args){
-        List<LibraryItem> items = List.of(
-                new Book("B1", "Introduction to Algorithms", "Cormen"),
-                new Magazine("M1", "Resonance", "Oct 2026"),
-                new ReferenceBook("R1", "Mahabharata", "Vyasa"));
-        for(LibraryItem i: items){
-            String rule = (i instanceof Borrowable b)? "fine per day " + b.getFinePerDay() : "not borrowable";
-            System.out.println(i.getId() + " " + i.getType() + " -> " + rule);
-        }
-        List<Member> members = List.of(
-                new Student("S1", "Ananya Rao"),
-                new Staff("T1", "Ravi Kumar"),
-                new Faculty("F1", "Meera Iyer"));
-        for (Member m : members) {
-            System.out.println(m.getId() + " " + m.getClass().getSimpleName()
-                    + " -> max " + m.getMaxItems()
-                    + ", period " + m.getLoanPeriodDays() + " days");
-        }
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class Main {
+
+    public static void main(String[] args) throws IOException {
+        Library library = new Library();
+        CommandLoop loop = new CommandLoop(buildRegistry(library));
+        loop.run(new BufferedReader(new InputStreamReader(System.in)), System.out);
+    }
+
+    static CommandRegistry buildRegistry(Library library) {
+        CommandRegistry registry = new CommandRegistry();
+        registry.register("ADD_BOOK", new AddBookCommand(library));
+        registry.register("ADD_MAGAZINE", new AddMagazineCommand(library));
+        registry.register("ADD_REFERENCE", new AddReferenceCommand(library));
+        registry.register("ADD_MEMBER", new AddMemberCommand(library));
+        registry.register("INVENTORY", new InventoryCommand(library));
+        return registry;
     }
 }

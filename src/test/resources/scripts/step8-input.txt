@@ -1,0 +1,7 @@
+INVENTORY
+ADD_BOOK|B2|Modern Operating Systems|Tanenbaum
+ADD_BOOK|B1|Introduction to Algorithms|Cormen
+ADD_MAGAZINE|M1|Resonance|Oct 2026
+ADD_REFERENCE|R1|Mahabharata|Vyasa
+ADD_MEMBER|S1|Ananya Rao|STUDENT
+INVENTORY
