@@ -117,38 +117,44 @@ class LibraryTest {
 
         @Test
         void memberAtTheirLimitIsRefused() {
-            library.addItem(new Book("B2", "Modern Operating Systems", "Tanenbaum"));
-            library.addItem(new Book("B3", "The Art of Computer Programming", "Knuth"));
-            library.addItem(new Book("B4", "Compilers", "Aho"));
+                library.addItem(new Book("B2", "Modern Operating Systems", "Tanenbaum"));
+                library.addItem(new Book("B3", "The Art of Computer Programming", "Knuth"));
+                library.addItem(new Book("B4", "Compilers", "Aho"));
+                library.borrow("S1", "B1");
+                library.borrow("S1", "B2");
+                library.borrow("S1", "B3");
+
+                assertThatThrownBy(() -> library.borrow("S1", "B4"))
+                        .isInstanceOf(BorrowLimitExceededException.class)
+                        .hasMessage("S1 has reached the limit of 3");
+            }
+
+        @Test
+        void returningOnTimeHasNoFineAndFreesTheItem() {
+                library.borrow("S1", "B1");
+
+                assertThat(library.returnItem("B1")).isZero();
+                assertThat(library.statusOf(book)).isEqualTo(ItemStatus.AVAILABLE);
+            }
+
+        @Test
+        void returningAnItemNotOnLoanFails() {
+                assertThatThrownBy(() -> library.returnItem("B1"))
+                        .isInstanceOf(ItemNotOnLoanException.class)
+                        .hasMessage("B1 is not on loan");
+            }
+
+        @Test
+        void returningAnUnknownItemSaysNotFound() {
+                assertThatThrownBy(() -> library.returnItem("B9"))
+                        .isInstanceOf(ItemNotFoundException.class)
+                        .hasMessage("item B9 not found");
+            }
+        @Test
+        void lateReturnIsFinedByDaysLate() {
             library.borrow("S1", "B1");
-            library.borrow("S1", "B2");
-            library.borrow("S1", "B3");
-
-            assertThatThrownBy(() -> library.borrow("S1", "B4"))
-                    .isInstanceOf(BorrowLimitExceededException.class)
-                    .hasMessage("S1 has reached the limit of 3");
-        }
-
-    @Test
-    void returningOnTimeHasNoFineAndFreesTheItem() {
-            library.borrow("S1", "B1");
-
-            assertThat(library.returnItem("B1")).isZero();
-            assertThat(library.statusOf(book)).isEqualTo(ItemStatus.AVAILABLE);
-        }
-
-    @Test
-    void returningAnItemNotOnLoanFails() {
-            assertThatThrownBy(() -> library.returnItem("B1"))
-                    .isInstanceOf(ItemNotOnLoanException.class)
-                    .hasMessage("B1 is not on loan");
-        }
-
-    @Test
-    void returningAnUnknownItemSaysNotFound() {
-            assertThatThrownBy(() -> library.returnItem("B9"))
-                    .isInstanceOf(ItemNotFoundException.class)
-                    .hasMessage("item B9 not found");
+            library.advance(20);
+            assertThat(library.returnItem("B1")).isEqualTo(12);
         }
     }
 }

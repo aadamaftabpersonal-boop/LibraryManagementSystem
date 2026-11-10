@@ -4,6 +4,7 @@ import com.lms.domain.item.Book;
 import com.lms.domain.member.Faculty;
 import com.lms.domain.member.Member;
 import com.lms.domain.member.Staff;
+import com.lms.domain.item.Magazine;
 import com.lms.domain.member.Student;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,5 +48,36 @@ class LoanTest {
         assertThat(loan.getItem()).isSameAs(book);
         assertThat(loan.getMember()).isSameAs(student);
         assertThat(loan.getBorrowDay()).isEqualTo(5);
+    }
+        @Test
+    void returningOnTheDueDayHasNoFine() {
+        Loan loan = new Loan(book, new Student("S1", "Ananya Rao"), 0);
+
+        assertThat(loan.daysLate(14)).isZero();
+        assertThat(loan.fineAsOf(14)).isZero();
+    }
+
+    @Test
+    void lateBookCostsTwoRupeesPerDay() {
+        Loan loan = new Loan(book, new Student("S1", "Ananya Rao"), 0);
+
+        assertThat(loan.daysLate(20)).isEqualTo(6);
+        assertThat(loan.fineAsOf(20)).isEqualTo(12);
+    }
+
+    @Test
+    void lateMagazineCostsOneRupeePerDay() {
+        Magazine magazine = new Magazine("M1", "Resonance", "Oct 2026");
+        Loan loan = new Loan(magazine, new Student("S1", "Ananya Rao"), 0);
+
+        assertThat(loan.fineAsOf(20)).isEqualTo(6);
+    }
+
+    @Test
+    void overdueOnlyAfterTheDueDay() {
+        Loan loan = new Loan(book, new Student("S1", "Ananya Rao"), 0);
+
+        assertThat(loan.isOverdue(14)).isFalse();
+        assertThat(loan.isOverdue(15)).isTrue();
     }
 }

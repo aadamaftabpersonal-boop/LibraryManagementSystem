@@ -70,4 +70,8 @@ public class Library {
     public int today() {
         return clock.today();
     }
+
+    public int advance(int days){
+        return clock.advance(days);
+    }
 }

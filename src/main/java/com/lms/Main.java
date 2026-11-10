@@ -10,6 +10,7 @@ import com.lms.cli.command.InventoryCommand;
 import com.lms.cli.command.BorrowCommand;
 import com.lms.cli.command.ReturnCommand;
 import com.lms.service.Library;
+import com.lms.cli.command.AdvanceCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +33,7 @@ public class Main {
         registry.register("INVENTORY", new InventoryCommand(library));
         registry.register("BORROW", new BorrowCommand(library));
         registry.register("RETURN", new ReturnCommand(library));
+        registry.register("ADVANCE", new AdvanceCommand(library));
         return registry;
     }
 }
