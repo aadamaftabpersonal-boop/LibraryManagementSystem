@@ -1,0 +1,33 @@
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK
+OK due on day 14
+OK due on day 14
+OK due on day 14
+ERROR S1 has reached the limit of 3
+OK due on day 21
+OK due on day 21
+OK due on day 21
+OK due on day 21
+ERROR T1 has reached the limit of 4
+OK due on day 30
+OK due on day 30
+OK due on day 30
+OK due on day 30
+OK due on day 30
+ERROR F1 has reached the limit of 5
+OK fine 0
+OK due on day 14

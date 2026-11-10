@@ -1,0 +1,13 @@
+OK
+OK
+OK
+OK
+ERROR item B9 not found
+ERROR member X1 not found
+ERROR R1 cannot be borrowed
+OK due on day 14
+ERROR B1 is on loan
+ERROR R1 is not on loan
+ERROR item B9 not found
+OK fine 0
+ERROR B1 is not on loan
