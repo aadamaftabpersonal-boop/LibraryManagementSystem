@@ -1,5 +1,6 @@
 package com.lms.cli.command;
 
+import com.lms.domain.item.ItemStatus;
 import com.lms.cli.Command;
 import com.lms.cli.ReportFormatter;
 import com.lms.domain.item.LibraryItem;
@@ -24,6 +25,12 @@ public class InventoryCommand implements Command {
     }
 
     private String formatRow(LibraryItem item) {
-        return item.getId() + "|" + item.getType() + "|" + library.statusOf(item);
+        ItemStatus status = library.statusOf(item);
+        String row = item.getId() + "|" + item.getType() + "|" + status;
+        if (status == ItemStatus.ON_LOAN) {
+            String memberId = library.findLoan(item.getId()).orElseThrow().getMember().getId();
+            row += "|" + memberId;
+        }
+        return row;
     }
 }

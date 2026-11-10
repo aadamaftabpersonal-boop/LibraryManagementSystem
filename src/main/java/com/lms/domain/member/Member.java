@@ -1,5 +1,6 @@
 package com.lms.domain.member;
 import java.util.Objects;
+import com.lms.domain.exception.BorrowLimitExceededException;
 
 public abstract class Member{
     private final String id;
@@ -27,5 +28,10 @@ public abstract class Member{
     @Override
     public int hashCode(){
         return id.hashCode();
+    }
+    public void ensureCanBorrow(int currentLoans){
+        if(currentLoans>=getMaxItems()){
+            throw new BorrowLimitExceededException(id, getMaxItems());
+        }
     }
 }

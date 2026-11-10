@@ -1,0 +1,17 @@
+ADD_BOOK|B1|Introduction to Algorithms|Cormen
+ADD_BOOK|B2|Modern Operating Systems|Tanenbaum
+ADD_BOOK|B3|The Art of Computer Programming|Knuth
+ADD_BOOK|B4|Compilers|Aho
+ADD_REFERENCE|R1|Mahabharata|Vyasa
+ADD_MEMBER|S1|Ananya Rao|STUDENT
+ADD_MEMBER|T1|Ravi Kumar|STAFF
+BORROW|S1|B1
+BORROW|S1|B2
+BORROW|S1|B3
+BORROW|S1|B4
+BORROW|T1|B1
+BORROW|T1|R1
+INVENTORY
+RETURN|B1
+RETURN|B1
+INVENTORY

@@ -7,6 +7,8 @@ import com.lms.cli.command.AddMagazineCommand;
 import com.lms.cli.command.AddMemberCommand;
 import com.lms.cli.command.AddReferenceCommand;
 import com.lms.cli.command.InventoryCommand;
+import com.lms.cli.command.BorrowCommand;
+import com.lms.cli.command.ReturnCommand;
 import com.lms.service.Library;
 
 import java.io.BufferedReader;
@@ -28,6 +30,8 @@ public class Main {
         registry.register("ADD_REFERENCE", new AddReferenceCommand(library));
         registry.register("ADD_MEMBER", new AddMemberCommand(library));
         registry.register("INVENTORY", new InventoryCommand(library));
+        registry.register("BORROW", new BorrowCommand(library));
+        registry.register("RETURN", new ReturnCommand(library));
         return registry;
     }
 }
